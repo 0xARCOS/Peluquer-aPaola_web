@@ -1,6 +1,26 @@
 # Peluquer-aPaola Web
 
-Landing page for **Paola Peluquería**, a hair salon in Torrejón del Rey, Guadalajara, Spain. Spanish-language, local-SEO-focused. All booking is via WhatsApp — no online booking system exists.
+Landing page + slot-booking system for **Paola Peluquería**, a hair salon in Torrejón del Rey, Guadalajara, Spain. Spanish-language, local-SEO-focused.
+
+## Booking system
+
+| File | Role |
+|------|------|
+| `booking.html` | 4-step booking page (service → date → slot → confirm) |
+| `apps-script.js` | Google Apps Script backend — copy-paste into script.google.com |
+
+**Flow:** client picks a service, picks a date, picks a 1-hour slot → enters name → slot is created in Paola's Google Calendar → WhatsApp opens with a pre-filled confirmation message.
+
+**Backend:** Google Apps Script Web App deployed on Paola's Google account (free tier). Exposes two GET endpoints:
+- `?action=slots&date=AAAA-MM-DD` → available slots for that day
+- `?action=book&date=...&time=...&service=...&name=...` → creates a Calendar event and blocks the slot
+
+**Wiring:** set `GAS_URL` in `booking.html` line ~`const GAS_URL = ''` to the deployed Web App URL. Until then the page shows static slots (no real-time availability check).
+
+**Schedule hardcoded in both files:**
+- Mon–Fri: 10:00–14:00 and 16:00–20:00 (1-hour slots: 10, 11, 12, 13, 16, 17, 18, 19)
+- Saturday: 10:30–14:00 (slots: 10:30, 11:30, 12:30)
+- Sunday: closed
 
 ## Tech Stack
 
