@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reservar cita — Paola Peluquería</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#0E0C10;--ink-soft:#171319;--ink-card:#1c181f;
+      --copper:#C08552;--copper-bright:#D89D6A;
+      --plum:#6B4E8C;--plum-soft:#8A6CAE;
+      --cream:#F4EFE9;--text:#E8E2DA;--text-mute:#A89F95;
+      --line:rgba(192,133,82,.22);--maxw:640px;--r:14px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.6;
+      font-weight:300;background:var(--ink);color:var(--text);min-height:100vh}
+    h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;
+      line-height:1.1;letter-spacing:.01em}
+    button{font-family:'Inter',sans-serif}
+    a{color:inherit}
+
+    /* ---- Header ---- */
+    header{position:sticky;top:0;z-index:100;padding:16px 0;
+      background:transparent;border-bottom:1px solid transparent;
+      transition:background .3s,border-color .3s}
+    header.scrolled{background:rgba(14,12,16,.92);backdrop-filter:blur(14px);
+      border-bottom-color:var(--line)}
+    .nav{display:flex;align-items:center;justify-content:space-between;
+      max-width:var(--maxw);margin:0 auto;padding:0 22px}
+    .brand{text-decoration:none;display:flex;flex-direction:column}
+    .brand b{font-family:'Cormorant Garamond',serif;font-size:1.35rem;
+      font-weight:600;letter-spacing:.16em;color:#fff}
+    .brand small{font-family:'Inter',sans-serif;font-size:.5rem;
+      letter-spacing:.3em;color:var(--copper);text-transform:uppercase;margin-top:-2px}
+    .back-link{font-size:.8rem;letter-spacing:.04em;color:var(--text-mute);
+      text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .2s}
+    .back-link:hover{color:var(--copper-bright)}
+    .back-link svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+
+    /* ---- Buttons ---- */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:13px 26px;border-radius:100px;font-size:.83rem;font-weight:500;
+      letter-spacing:.06em;text-decoration:none;cursor:pointer;border:none;
+      transition:transform .18s,box-shadow .18s,opacity .18s}
+    .btn-primary{background:linear-gradient(135deg,var(--copper),var(--copper-bright));color:#241608}
+    .btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(192,133,82,.4)}
+    .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+    .btn-ghost:hover{border-color:var(--copper);color:var(--copper-bright)}
+    .btn-wa{background:#1b1720;color:var(--text);border:1px solid rgba(37,211,102,.35)}
+    .btn-wa:hover{border-color:#25D366;color:#fff;transform:translateY(-2px)}
+    .btn-block{width:100%;padding:15px}
+    .btn:disabled{opacity:.38;cursor:not-allowed;transform:none!important}
+
+    /* ---- Layout ---- */
+    .booking-wrap{max-width:var(--maxw);margin:0 auto;padding:36px 22px 80px}
+
+    /* ---- Progress bar ---- */
+    .progress{display:flex;align-items:center;margin-bottom:44px}
+    .prog-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:.72rem;font-weight:500;border:1px solid var(--line);
+      color:var(--text-mute);background:var(--ink-soft);
+      transition:background .3s,border-color .3s,color .3s}
+    .prog-dot.active{background:var(--copper);border-color:var(--copper);color:#241608;font-weight:600}
+    .prog-dot.done{background:transparent;border-color:var(--copper);color:var(--copper)}
+    .prog-line{flex:1;height:1px;background:var(--line);transition:background .3s}
+    .prog-line.done{background:var(--copper)}
+
+    /* ---- Step panels ---- */
+    .step-panel{display:none}
+    .step-panel.active{display:block}
+    .eyebrow{display:block;font-size:.7rem;font-weight:500;letter-spacing:.34em;
+      text-transform:uppercase;color:var(--copper);margin-bottom:10px}
+    .step-head{margin-bottom:28px}
+    .step-head h1,.step-head h2{font-size:clamp(1.8rem,5vw,2.6rem);color:#fff;margin-bottom:6px}
+    .step-head p{color:var(--text-mute);font-size:.9rem}
+
+    /* ---- Step nav (back button) ---- */
+    .step-nav{margin-top:22px}
+
+    /* ---- PASO 1: Servicios ---- */
+    .srv-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .srv-card{background:var(--ink-card);border:1px solid var(--line);
+      border-radius:var(--r);padding:20px 18px;cursor:pointer;text-align:left;
+      transition:border-color .2s,transform .2s,background .2s}
+    .srv-card:hover{border-color:var(--copper);transform:translateY(-3px)}
+    .srv-card.selected{border-color:var(--copper);background:rgba(192,133,82,.09)}
+    .srv-card svg{width:26px;height:26px;stroke:var(--copper);fill:none;
+      stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;
+      margin-bottom:11px;display:block}
+    .srv-card h3{font-size:1.1rem;color:#fff;margin-bottom:3px}
+    .srv-card p{font-size:.79rem;color:var(--text-mute);line-height:1.45}
+
+    /* ---- PASO 2: Calendario ---- */
+    .cal-wrap{background:var(--ink-card);border:1px solid var(--line);
+      border-radius:var(--r);padding:22px}
+    .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .cal-arrow{background:none;border:1px solid var(--line);border-radius:8px;
+      width:34px;height:34px;cursor:pointer;color:var(--text-mute);
+      display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+    .cal-arrow:hover{border-color:var(--copper);color:var(--copper-bright)}
+    .cal-arrow svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+    .cal-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;
+      color:#fff;font-weight:500;letter-spacing:.04em;text-transform:capitalize}
+    .cal-dows{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px}
+    .cal-dow{font-size:.68rem;letter-spacing:.05em;color:var(--text-mute);
+      text-align:center;padding:4px 0;text-transform:uppercase}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+    .cal-day{aspect-ratio:1;border-radius:7px;border:none;background:transparent;
+      font-size:.83rem;color:rgba(168,159,149,.35);cursor:default;
+      display:flex;align-items:center;justify-content:center;
+      transition:background .13s,color .13s}
+    .cal-day.avail{color:var(--text);cursor:pointer}
+    .cal-day.avail:hover{background:rgba(192,133,82,.16);color:#fff}
+    .cal-day.today.avail{border:1px solid rgba(192,133,82,.38)}
+    .cal-day.sel{background:var(--copper)!important;color:#241608!important;font-weight:600}
+
+    /* ---- PASO 3: Slots ---- */
+    .slots-section{margin-bottom:4px}
+    .slots-label{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--text-mute);margin-bottom:10px}
+    .slots-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+    .slot-btn{background:var(--ink-card);border:1px solid var(--line);border-radius:10px;
+      padding:13px 6px;font-size:.88rem;color:var(--text);cursor:pointer;
+      text-align:center;transition:border-color .15s,background .15s,transform .15s}
+    .slot-btn:hover{border-color:var(--copper);color:var(--copper-bright);transform:translateY(-2px)}
+    .slot-btn.sel{background:var(--copper);border-color:var(--copper);color:#241608;font-weight:600}
+    .slots-msg{grid-column:1/-1;padding:28px;text-align:center;font-size:.88rem;color:var(--text-mute)}
+    .slots-msg.empty{color:var(--copper-bright)}
+    .slots-msg.error{color:#d07070}
+
+    /* ---- PASO 4: Resumen + datos ---- */
+    .summary{background:var(--ink-card);border:1px solid var(--line);
+      border-radius:var(--r);padding:18px 20px;margin-bottom:22px}
+    .sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0}
+    .sum-row+.sum-row{border-top:1px solid rgba(192,133,82,.1)}
+    .sum-lbl{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mute)}
+    .sum-val{font-size:.92rem;color:#fff}
+    .field{margin-bottom:18px}
+    .field label{display:block;font-size:.72rem;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--text-mute);margin-bottom:7px}
+    .field input{width:100%;background:var(--ink-card);border:1px solid var(--line);
+      border-radius:10px;padding:13px 15px;font-family:'Inter',sans-serif;
+      font-size:.93rem;color:var(--text);outline:none;transition:border-color .2s}
+    .field input:focus{border-color:var(--copper)}
+    .field input::placeholder{color:var(--text-mute)}
+
+    /* ---- Estado éxito ---- */
+    #success-state{display:none;text-align:center}
+    .success-icon{width:60px;height:60px;border-radius:50%;
+      background:rgba(192,133,82,.12);border:1px solid var(--copper);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+    .success-icon svg{width:26px;height:26px;stroke:var(--copper);fill:none;stroke-width:2}
+    #success-state h2{font-size:clamp(1.6rem,4vw,2.2rem);color:#fff;margin-bottom:8px}
+    #success-state p{color:var(--text-mute);font-size:.9rem;margin-bottom:22px}
+    #success-state .summary{text-align:left;margin-bottom:22px}
+    .wa-note{font-size:.78rem;color:var(--text-mute);margin-top:12px;line-height:1.5}
+
+    /* ---- Feedback inline ---- */
+    .feedback{border-radius:10px;padding:12px 16px;font-size:.84rem;
+      margin-top:14px;display:none;line-height:1.5}
+    .feedback.err{background:rgba(208,112,112,.1);border:1px solid rgba(208,112,112,.3);color:#d07070;display:block}
+    .feedback.ok{background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.25);color:#3dcc7a;display:block}
+
+    /* ---- Banner GAS no configurado ---- */
+    .gas-banner{background:rgba(192,133,82,.06);border:1px solid var(--line);
+      border-radius:var(--r);padding:24px;text-align:center;margin-top:14px;font-size:.85rem;
+      color:var(--text-mute);line-height:1.6}
+    .gas-banner strong{color:var(--copper-bright);display:block;margin-bottom:6px;font-family:'Cormorant Garamond',serif;font-size:1.1rem}
+
+    /* ---- Responsive ---- */
+    @media(max-width:680px){
+      .srv-grid{grid-template-columns:1fr}
+      .slots-grid{grid-template-columns:repeat(3,1fr)}
+      .booking-wrap{padding:24px 16px 60px}
+    }
+    @media(max-width:400px){
+      .slots-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+
+<header id="header">
+  <div class="nav">
+    <a href="index.html" class="brand">
+      <b>PAOLA</b>
+      <small>Peluquería · Torrejón del Rey</small>
+    </a>
+    <a href="index.html" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
+  </div>
+</header>
+
+<main class="booking-wrap">
+
+  <!-- Barra de progreso -->
+  <div class="progress">
+    <div class="prog-dot active" id="dot-1">1</div>
+    <div class="prog-line" id="line-1"></div>
+    <div class="prog-dot" id="dot-2">2</div>
+    <div class="prog-line" id="line-2"></div>
+    <div class="prog-dot" id="dot-3">3</div>
+    <div class="prog-line" id="line-3"></div>
+    <div class="prog-dot" id="dot-4">4</div>
+  </div>
+
+  <!-- ===== PASO 1: Servicio ===== -->
+  <section class="step-panel active" id="panel-1">
+    <div class="step-head">
+      <span class="eyebrow">Paso 1 de 4</span>
+      <h1>¿Qué servicio necesitas?</h1>
+    </div>
+    <div class="srv-grid">
+
+      <button class="srv-card" data-service="Color y mechas">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+        <h3>Color y mechas</h3>
+        <p>Mechas, balayage, baño de color y cobertura de canas</p>
+      </button>
+
+      <button class="srv-card" data-service="Corte y peinado">
+        <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></svg>
+        <h3>Corte y peinado</h3>
+        <p>Corte de señora, caballero y niños</p>
+      </button>
+
+      <button class="srv-card" data-service="Recogido y peinado especial">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+        <h3>Recogido / Peinado especial</h3>
+        <p>Recogidos y peinados para eventos y bodas</p>
+      </button>
+
+      <button class="srv-card" data-service="Tratamiento capilar">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h3>Tratamiento capilar</h3>
+        <p>Hidratación, nutrición y alisados</p>
+      </button>
+
+      <button class="srv-card" data-service="Coloración completa">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <h3>Coloración completa</h3>
+        <p>Tinte completo y cobertura de canas</p>
+      </button>
+
+      <button class="srv-card" data-service="Otro servicio">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        <h3>Otro servicio</h3>
+        <p>Consultar disponibilidad con Paola</p>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- ===== PASO 2: Fecha ===== -->
+  <section class="step-panel" id="panel-2">
+    <div class="step-head">
+      <span class="eyebrow">Paso 2 de 4</span>
+      <h2>Elige un día</h2>
+      <p>Lun–Vie 10–14 h · 16–20 h &nbsp;|&nbsp; Sábado 10:30–14 h &nbsp;|&nbsp; Domingo cerrado</p>
+    </div>
+    <div class="cal-wrap">
+      <div class="cal-nav">
+        <button class="cal-arrow" id="prev-month" aria-label="Mes anterior">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="cal-title" id="cal-title"></span>
+        <button class="cal-arrow" id="next-month" aria-label="Mes siguiente">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="cal-dows">
+        <div class="cal-dow">L</div><div class="cal-dow">M</div>
+        <div class="cal-dow">X</div><div class="cal-dow">J</div>
+        <div class="cal-dow">V</div><div class="cal-dow">S</div>
+        <div class="cal-dow">D</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Atrás</button>
+    </div>
+  </section>
+
+  <!-- ===== PASO 3: Hora ===== -->
+  <section class="step-panel" id="panel-3">
+    <div class="step-head">
+      <span class="eyebrow">Paso 3 de 4</span>
+      <h2>Elige tu hora</h2>
+      <p id="date-label"></p>
+    </div>
+    <div id="slots-wrap">
+      <div class="slots-grid"><div class="slots-msg">Cargando disponibilidad…</div></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="goStep(2)">← Atrás</button>
+    </div>
+  </section>
+
+  <!-- ===== PASO 4: Datos + confirmación ===== -->
+  <section class="step-panel" id="panel-4">
+
+    <!-- Estado: formulario -->
+    <div id="form-state">
+      <div class="step-head">
+        <span class="eyebrow">Paso 4 de 4</span>
+        <h2>Casi listo</h2>
+      </div>
+      <div class="summary" id="summary">
+        <div class="sum-row">
+          <span class="sum-lbl">Servicio</span>
+          <span class="sum-val" id="sum-svc"></span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-lbl">Día</span>
+          <span class="sum-val" id="sum-date"></span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-lbl">Hora</span>
+          <span class="sum-val" id="sum-time"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="inp-nombre">Tu nombre</label>
+        <input type="text" id="inp-nombre" placeholder="Nombre y apellido" autocomplete="name">
+      </div>
+      <button class="btn btn-primary btn-block" id="confirm-btn">
+        Reservar cita
+      </button>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- Estado: éxito -->
+    <div id="success-state">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>¡Cita reservada!</h2>
+      <p>Tu slot ha quedado bloqueado en el calendario de Paola.<br>Ahora abre WhatsApp para que lo confirme contigo.</p>
+      <div class="summary">
+        <div class="sum-row">
+          <span class="sum-lbl">Servicio</span>
+          <span class="sum-val" id="ok-svc"></span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-lbl">Día</span>
+          <span class="sum-val" id="ok-date"></span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-lbl">Hora</span>
+          <span class="sum-val" id="ok-time"></span>
+        </div>
+      </div>
+      <a id="wa-link" href="#" target="_blank" rel="noopener" class="btn btn-wa btn-block">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#25D366;stroke:none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a9.9 9.9 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.118 1.535 5.846L.057 23.267a.75.75 0 0 0 .921.921l5.421-1.478A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.714 9.714 0 0 1-4.952-1.356l-.355-.21-3.676 1.002 1.002-3.676-.21-.355A9.75 9.75 0 1 1 12 21.75z"/></svg>
+        Abrir WhatsApp con Paola
+      </a>
+      <p class="wa-note">Paola recibirá los detalles y te confirmará por WhatsApp. Si necesitas cambiar la cita, escríbele directamente.</p>
+    </div>
+
+    <div class="step-nav" id="back-4">
+      <button class="btn btn-ghost" onclick="goStep(3)">← Atrás</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN — pega aquí la URL de tu Google Apps Script
+// Instrucciones en apps-script.js
+// ============================================================
+const GAS_URL = '';
+
+// ============================================================
+// Estado
+// ============================================================
+const B = { service: null, date: null, time: null, name: null };
+let calY, calM;
+
+// ============================================================
+// Inicialización
+// ============================================================
+(function init() {
+  const now = new Date();
+  calY = now.getFullYear();
+  calM = now.getMonth();
+  renderCal();
+
+  document.querySelectorAll('.srv-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.srv-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      B.service = card.dataset.service;
+      setTimeout(() => goStep(2), 180);
+    });
+  });
+
+  document.getElementById('prev-month').addEventListener('click', () => {
+    calM--; if (calM < 0) { calM = 11; calY--; } renderCal();
+  });
+  document.getElementById('next-month').addEventListener('click', () => {
+    calM++; if (calM > 11) { calM = 0; calY++; } renderCal();
+  });
+
+  document.getElementById('confirm-btn').addEventListener('click', confirmBooking);
+
+  window.addEventListener('scroll', () => {
+    document.getElementById('header').classList.toggle('scrolled', scrollY > 40);
+  });
+})();
+
+// ============================================================
+// Navegación entre pasos
+// ============================================================
+function goStep(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + n).classList.add('active');
+
+  for (let i = 1; i <= 4; i++) {
+    const d = document.getElementById('dot-' + i);
+    d.classList.remove('active', 'done');
+    if (i < n) d.classList.add('done');
+    else if (i === n) d.classList.add('active');
+  }
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('line-' + i).classList.toggle('done', i < n);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// Calendario
+// ============================================================
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+function renderCal() {
+  document.getElementById('cal-title').textContent = MESES[calM] + ' ' + calY;
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const firstDow = new Date(calY, calM, 1).getDay(); // 0=Dom
+  const offset   = firstDow === 0 ? 6 : firstDow - 1; // ajuste a Lun-inicio
+  const total    = new Date(calY, calM + 1, 0).getDate();
+
+  for (let i = 0; i < offset; i++) {
+    const el = document.createElement('div'); el.className = 'cal-day'; grid.appendChild(el);
+  }
+  for (let d = 1; d <= total; d++) {
+    const date  = new Date(calY, calM, d);
+    const dow   = date.getDay();
+    const past  = date < today;
+    const sun   = dow === 0;
+    const ds    = calY + '-' + pad(calM + 1) + '-' + pad(d);
+    const btn   = document.createElement('button');
+    btn.className = 'cal-day';
+    btn.textContent = d;
+    if (date.getTime() === today.getTime()) btn.classList.add('today');
+    if (ds === B.date) btn.classList.add('sel');
+    if (past || sun) { btn.disabled = true; }
+    else {
+      btn.classList.add('avail');
+      btn.addEventListener('click', () => selectDate(ds, date, btn));
+    }
+    grid.appendChild(btn);
+  }
+}
+
+// ============================================================
+// Selección de fecha
+// ============================================================
+async function selectDate(ds, dateObj, btn) {
+  B.date = ds; B.time = null;
+  document.querySelectorAll('.cal-day.sel').forEach(el => el.classList.remove('sel'));
+  btn.classList.add('sel');
+
+  const nom = DIAS[dateObj.getDay()];
+  document.getElementById('date-label').textContent =
+    nom.charAt(0).toUpperCase() + nom.slice(1) + ', ' +
+    dateObj.getDate() + ' de ' + MESES[dateObj.getMonth()].toLowerCase() + ' de ' + dateObj.getFullYear();
+
+  goStep(3);
+  await loadSlots(ds);
+}
+
+// ============================================================
+// Carga y renderizado de slots
+// ============================================================
+async function loadSlots(ds) {
+  const wrap = document.getElementById('slots-wrap');
+  wrap.innerHTML = '<div class="slots-grid"><div class="slots-msg">Cargando disponibilidad…</div></div>';
+
+  let slots;
+  if (GAS_URL) {
+    try {
+      const r = await fetch(GAS_URL + '?action=slots&date=' + ds);
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+      slots = d.slots;
+    } catch {
+      wrap.innerHTML = '<div class="slots-grid"><div class="slots-msg error">No se pudo cargar la disponibilidad. <a href="https://wa.me/34642078029" style="color:var(--copper)">Reserva por WhatsApp</a></div></div>';
+      return;
+    }
+  } else {
+    slots = staticSlots(ds);
+  }
+
+  if (!slots.length) {
+    wrap.innerHTML = '<div class="slots-grid"><div class="slots-msg empty">No hay huecos este día.<br>Prueba con otra fecha.</div></div>';
+    return;
+  }
+
+  // Agrupar por franja (mañana / tarde)
+  const mañana = slots.filter(s => parseInt(s) < 14);
+  const tarde  = slots.filter(s => parseInt(s) >= 14);
+  let html = '';
+
+  if (mañana.length) {
+    html += '<p class="slots-label">Mañana</p><div class="slots-grid">' +
+      mañana.map(s => `<button class="slot-btn" data-time="${s}">${s}</button>`).join('') +
+      '</div>';
+  }
+  if (tarde.length) {
+    html += '<p class="slots-label" style="margin-top:16px">Tarde</p><div class="slots-grid">' +
+      tarde.map(s => `<button class="slot-btn" data-time="${s}">${s}</button>`).join('') +
+      '</div>';
+  }
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('.slot-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('.slot-btn.sel').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      B.time = btn.dataset.time;
+      setTimeout(() => { fillSummary(); goStep(4); }, 180);
+    });
+  });
+}
+
+// Slots estáticos cuando GAS no está configurado
+function staticSlots(ds) {
+  const dow = new Date(ds + 'T12:00:00').getDay();
+  if (dow === 0) return [];
+  const s = [];
+  if (dow >= 1 && dow <= 5) {
+    for (let h = 10; h < 14; h++) s.push(pad(h) + ':00');
+    for (let h = 16; h < 20; h++) s.push(pad(h) + ':00');
+  } else {
+    s.push('10:30', '11:30', '12:30');
+  }
+  return s;
+}
+
+// ============================================================
+// Rellena el resumen antes del paso 4
+// ============================================================
+function fillSummary() {
+  const dateObj = new Date(B.date + 'T12:00:00');
+  const nom = DIAS[dateObj.getDay()];
+  const dateLong = nom.charAt(0).toUpperCase() + nom.slice(1) + ', ' +
+    dateObj.getDate() + ' de ' + MESES[dateObj.getMonth()].toLowerCase();
+
+  document.getElementById('sum-svc').textContent  = B.service;
+  document.getElementById('sum-date').textContent = dateLong;
+  document.getElementById('sum-time').textContent = B.time + ' h';
+
+  // Reset form state (por si el usuario vuelve)
+  document.getElementById('form-state').style.display   = '';
+  document.getElementById('success-state').style.display = 'none';
+  document.getElementById('back-4').style.display = '';
+  clearFeedback();
+}
+
+// ============================================================
+// Confirmación
+// ============================================================
+async function confirmBooking() {
+  const nombre = document.getElementById('inp-nombre').value.trim();
+  if (!nombre) { showFeedback('Por favor, escribe tu nombre.', 'err'); return; }
+
+  const btn = document.getElementById('confirm-btn');
+  btn.disabled = true; btn.textContent = 'Procesando…'; clearFeedback();
+
+  if (GAS_URL) {
+    try {
+      const params = new URLSearchParams({ action:'book', date:B.date, time:B.time, service:B.service, name:nombre });
+      const r = await fetch(GAS_URL + '?' + params);
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+    } catch (err) {
+      showFeedback(err.message || 'Este horario ya no está disponible. Por favor elige otro.', 'err');
+      btn.disabled = false; btn.textContent = 'Reservar cita';
+      goStep(3); await loadSlots(B.date);
+      return;
+    }
+  }
+
+  B.name = nombre;
+  showSuccess();
+  btn.disabled = false; btn.textContent = 'Reservar cita';
+}
+
+function showSuccess() {
+  const dateObj = new Date(B.date + 'T12:00:00');
+  const nom = DIAS[dateObj.getDay()];
+  const dateLong = nom.charAt(0).toUpperCase() + nom.slice(1) + ', ' +
+    dateObj.getDate() + ' de ' + MESES[dateObj.getMonth()].toLowerCase();
+
+  document.getElementById('ok-svc').textContent  = B.service;
+  document.getElementById('ok-date').textContent = dateLong;
+  document.getElementById('ok-time').textContent = B.time + ' h';
+
+  const msg = 'Hola Paola, quiero confirmar mi cita para el ' + dateLong +
+    ' a las ' + B.time + ' h para ' + B.service + '. Soy ' + B.name + '.';
+  document.getElementById('wa-link').href = 'https://wa.me/34642078029?text=' + encodeURIComponent(msg);
+
+  document.getElementById('form-state').style.display   = 'none';
+  document.getElementById('success-state').style.display = 'block';
+  document.getElementById('back-4').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showFeedback(msg, cls) {
+  const el = document.getElementById('feedback');
+  el.textContent = msg; el.className = 'feedback ' + cls;
+}
+function clearFeedback() {
+  document.getElementById('feedback').className = 'feedback';
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+</script>
+
+</body>
+</html>
