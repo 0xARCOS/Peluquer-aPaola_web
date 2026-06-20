@@ -26,7 +26,7 @@
 // ===================== CONFIGURACIÓN ============================
 // Email de Paola: recibirá un aviso instantáneo en cada reserva
 // (le llega al móvil por la app de Gmail). DÉJALO BIEN PUESTO.
-const OWNER_EMAIL = 'CORREO_DE_PAOLA@gmail.com';
+const OWNER_EMAIL = 'paolapeluqueriaybelleza@gmail.com';
 
 // Calendario donde se crean las citas.
 //   '' (vacío)  → calendario principal de la cuenta que ejecuta el script.
