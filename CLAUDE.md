@@ -17,6 +17,10 @@ Landing page + slot-booking system for **Paola Peluquería**, a hair salon in To
 
 **Wiring:** set `GAS_URL` in `booking.html` line ~`const GAS_URL = ''` to the deployed Web App URL. Until then the page shows static slots (no real-time availability check).
 
+**Owner alerts:** the script must be deployed **under Paola's Google account** ("execute as me") so events land on her calendar. Set `OWNER_EMAIL` (and optionally `CALENDAR_ID`) in `apps-script.js`. On each booking it (1) creates the Calendar event, (2) adds popup reminders, and (3) emails Paola — Google does NOT push-notify the owner for events its own script creates, so the email is what reaches her phone.
+
+**Entry points:** the header/sticky/final "Reservar cita" buttons in `index.html` link to `booking.html`; the WhatsApp/phone CTAs stay as-is.
+
 **Schedule hardcoded in both files:**
 - Mon–Fri: 10:00–14:00 and 16:00–20:00 (1-hour slots: 10, 11, 12, 13, 16, 17, 18, 19)
 - Saturday: 10:30–14:00 (slots: 10:30, 11:30, 12:30)
@@ -37,12 +41,12 @@ No build step required. Open the HTML file directly in a browser:
 ```bash
 # Quick local preview (Python)
 python3 -m http.server 8080
-# then open http://localhost:8080/index\(4\).html
+# then open http://localhost:8080/index.html  (booking at /booking.html)
 ```
 
-Or just drag `index(4).html` into a browser tab.
+Or just drag `index.html` into a browser tab.
 
-> **Note:** The file is named `index(4).html` due to repeated downloads. Rename it to `index.html` before deploying.
+> **Note:** `index.html` is the canonical, deployed file (Netlify publishes the repo root). A stale `index(4).html` duplicate used to exist — it was removed to avoid editing the wrong file.
 
 ## Deployment
 
@@ -62,7 +66,7 @@ No test framework exists. Test manually:
 
 ## Architecture
 
-The entire site lives in **one file**: `index(4).html` (~772 lines, ~4.3 MB — large due to base64 images).
+The landing page lives in **one file**: `index.html` (~775 lines, ~4.3 MB — large due to base64 images). The booking flow lives in `booking.html` + `apps-script.js` (see Booking system above).
 
 ### Section map
 
